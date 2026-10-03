@@ -1,6 +1,6 @@
 // RoomController: the meeting state machine (intro → pitch → qa → verdict → ended). Framework-agnostic;
 // React subscribes via useSyncExternalStore(controller.subscribe, controller.getState). See spec §7.3.
-import { archetype } from '../catalog';
+import { archetype, avatarInfo } from '../catalog';
 import { api } from '../client/api';
 import { InvestorSession } from '../live/investor-session';
 import { MicCapture } from '../live/mic';
@@ -234,6 +234,7 @@ export class RoomController {
       videoBitrate: videoBitrateFor(this.config.seats.length),
     });
     this.sessions.set(seat.id, s);
+    s.player.setBackdrop(avatarInfo(seat.avatar).image);
     this.setSeat(seat.id, { element: s.player.element });
     this.wireSeat(seat.id, s);
     try {

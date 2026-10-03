@@ -43,11 +43,11 @@ async function signIn(p, role) {
   await p.getByRole('button', { name: 'Sign in →' }).click();
   await p.waitForURL(new RegExp(`/${role}$`), { timeout: 15000 });
 }
-/** Pitch/Q&A pills + remove seats from the end (default panel: Vera, Kai, Ben, Leo). */
+/** Pitch/Q&A pills + remove seats from the end (default panel: Jay, Vera, Sam, Kira). */
 async function format(p) {
   await p.getByRole('radiogroup', { name: 'Pitch length' }).getByRole('radio', { name: '2 min' }).click();
   await p.getByRole('radiogroup', { name: 'Q&A length' }).getByRole('radio', { name: QA_MIN }).click();
-  for (const name of ['Remove Leo', 'Remove Ben', 'Remove Kai'].slice(0, 4 - SEATS)) await p.getByRole('button', { name }).click();
+  for (const name of ['Remove Kira', 'Remove Sam', 'Remove Vera'].slice(0, 4 - SEATS)) await p.getByRole('button', { name }).click();
 }
 
 let vcPage = null;
@@ -67,7 +67,7 @@ if (FLOW === 'founder') {
   await vcPage.goto(`${BASE}/investor/panels/new`);
   await vcPage.getByLabel('Panel name').fill('E2E Seed screening');
   await format(vcPage);
-  await vcPage.getByLabel('Custom instructions for Vera').fill('Ask how confident they are in their revenue numbers. Ask why this is better than FloQast.');
+  await vcPage.getByLabel('Custom instructions for Jay').fill('Ask how confident they are in their revenue numbers. Ask why this is better than FloQast.');
   await vcPage.screenshot({ path: `${OUT}/00-panel-config.png`, fullPage: true });
   await vcPage.getByRole('button', { name: 'Create panel' }).click();
   await vcPage.waitForURL(/\/investor\/panels\/[0-9a-f-]{36}$/, { timeout: 20000 });

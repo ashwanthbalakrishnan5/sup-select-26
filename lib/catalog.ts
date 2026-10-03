@@ -7,22 +7,27 @@ export interface AvatarInfo {
   look: string;
   defaultArchetype: ArchetypeId;
   defaultVoice: string;
+  photoreal?: boolean;
 }
 
-// Prebuilt avatars that exist (probed ~530 names; Jay, Vera, Sam, Kira are photoreal). Photoreal first.
-export const AVATARS: AvatarInfo[] = [
-  { name: 'Jay', image: '/avatars/Jay.jpg', look: 'Grey suit, blue tie', defaultArchetype: 'numbers', defaultVoice: 'Iapetus' },
-  { name: 'Vera', image: '/avatars/Vera.jpg', look: 'Silver bob, black high-neck', defaultArchetype: 'chair', defaultVoice: 'Kore' },
-  { name: 'Sam', image: '/avatars/Sam.jpg', look: 'Beard, glasses, tweed blazer', defaultArchetype: 'technical', defaultVoice: 'Sadaltager' },
-  { name: 'Kira', image: '/avatars/Kira.jpg', look: 'Curly hair, navy work jacket', defaultArchetype: 'angel', defaultVoice: 'Aoede' },
+// Every prebuilt avatar that exists (probed ~530 names). Only the photoreal ones are offered in the app (AVATARS);
+// the stylized 3D ones (Kai, Ben, Leo, Carmen) stay valid so older sessions still render.
+export const ALL_AVATARS: AvatarInfo[] = [
+  { name: 'Jay', image: '/avatars/Jay.jpg', look: 'Grey suit, blue tie', defaultArchetype: 'numbers', defaultVoice: 'Iapetus', photoreal: true },
+  { name: 'Vera', image: '/avatars/Vera.jpg', look: 'Silver bob, black high-neck', defaultArchetype: 'chair', defaultVoice: 'Kore', photoreal: true },
+  { name: 'Sam', image: '/avatars/Sam.jpg', look: 'Beard, glasses, tweed blazer', defaultArchetype: 'technical', defaultVoice: 'Sadaltager', photoreal: true },
+  { name: 'Kira', image: '/avatars/Kira.jpg', look: 'Curly hair, navy work jacket', defaultArchetype: 'angel', defaultVoice: 'Aoede', photoreal: true },
   { name: 'Kai', image: '/avatars/Kai.jpg', look: 'Young, sunglasses on head', defaultArchetype: 'technical', defaultVoice: 'Puck' },
   { name: 'Ben', image: '/avatars/Ben.jpg', look: 'Young, beard, olive jacket', defaultArchetype: 'numbers', defaultVoice: 'Charon' },
-  { name: 'Leo', image: '/avatars/Leo.jpg', look: 'Older, beret and scarf', defaultArchetype: 'angel', defaultVoice: 'Algieba' },
-  { name: 'Paul', image: '/avatars/Paul.jpg', look: 'Senior, suit and tie', defaultArchetype: 'shark', defaultVoice: 'Algenib' },
+  { name: 'Leo', image: '/avatars/Leo.jpg', look: 'Older, painter beret and apron', defaultArchetype: 'angel', defaultVoice: 'Algieba' },
+  { name: 'Paul', image: '/avatars/Paul.jpg', look: 'Senior, dark suit and tie', defaultArchetype: 'shark', defaultVoice: 'Algenib', photoreal: true },
   { name: 'Carmen', image: '/avatars/Carmen.jpg', look: 'Grey bun, glasses, paisley scarf', defaultArchetype: 'chair', defaultVoice: 'Gacrux' },
 ];
 
-export const avatarInfo = (name: AvatarName): AvatarInfo => AVATARS.find((a) => a.name === name)!;
+/** Offered in pickers, the panel builder and the landing page. Order = default panel order. */
+export const AVATARS = ALL_AVATARS.filter((a) => a.photoreal);
+
+export const avatarInfo = (name: AvatarName): AvatarInfo => ALL_AVATARS.find((a) => a.name === name)!;
 
 export interface Archetype {
   id: ArchetypeId;

@@ -20,10 +20,11 @@ export class AvatarPlayer {
     this.video = document.createElement('video');
     this.video.playsInline = true;
     this.video.autoplay = true;
-    this.video.style.cssText = 'width:100%;height:100%;object-fit:contain;background:#000'; // never crop the face
+    // Avatar video is 9:16 portrait: letterbox it (never crop the face) over a blurred backdrop (setBackdrop).
+    this.video.style.cssText = 'position:relative;width:100%;height:100%;object-fit:contain;background:transparent';
     this.video.src = URL.createObjectURL(this.ms);
     this.element = document.createElement('div');
-    this.element.style.cssText = 'width:100%;height:100%';
+    this.element.style.cssText = 'position:relative;width:100%;height:100%;overflow:hidden;background:#000';
     this.element.appendChild(this.video);
     this.ms.addEventListener(
       'sourceopen',
@@ -38,6 +39,13 @@ export class AvatarPlayer {
       this.tick = true;
       this.pump();
     }, 5000);
+  }
+
+  /** Fills the letterbox bars with a blurred copy of the avatar's still (cheap: a static image, no second decode). */
+  setBackdrop(imageUrl: string) {
+    const bg = document.createElement('div');
+    bg.style.cssText = `position:absolute;inset:-40px;background:url(${imageUrl}) center/cover;filter:blur(28px) brightness(.55)`;
+    this.element.insertBefore(bg, this.video);
   }
 
   static supported() {

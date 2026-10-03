@@ -20,7 +20,7 @@ import type { SessionConfig, Stage } from '@/lib/types';
 import { PillGroup } from './pill-group';
 import { SeatCard } from './seat-card';
 
-const STORAGE_KEY = 'sandboxhill:config';
+const STORAGE_KEY = 'sandboxhill:config:v2'; // v2: photoreal default panel (drops older saved seats)
 
 export function loadSavedConfig(): SessionConfig | null {
   try {

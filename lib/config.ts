@@ -1,9 +1,9 @@
 // Session config: defaults, validation (zod) and seat helpers. See spec §4, §6.
 import { z } from 'zod';
-import { AVATARS, MAX_PITCH_PLUS_QA, MAX_SEATS, VOICES, avatarInfo } from './catalog';
+import { ALL_AVATARS, AVATARS, MAX_PITCH_PLUS_QA, MAX_SEATS, VOICES, avatarInfo } from './catalog';
 import type { AvatarName, Candidate, Panel, PanelConfig, SeatConfig, SessionConfig } from './types';
 
-const avatarNames = AVATARS.map((a) => a.name) as [AvatarName, ...AvatarName[]];
+const avatarNames = ALL_AVATARS.map((a) => a.name) as [AvatarName, ...AvatarName[]];
 const voiceNames = VOICES.map((v) => v.name) as [string, ...string[]];
 
 export const SeatSchema = z.object({

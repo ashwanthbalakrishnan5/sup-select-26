@@ -58,6 +58,7 @@ const SEAT_STAGGER_MS = 400; // never open avatar sessions in a burst (quota loc
 const CONNECT_TIMEOUT_MS = 20_000;
 const CHUNK_MS = 60_000;
 const INTRO_CAP_MS = 120_000; // the intro is conversational now; the flow model hands over when the founder is ready
+const SPEECH_RMS = 0.02; // mic chunk energy that counts as speech (voice sampler uses 0.015)
 const INTENT_PAUSE_MS = 1200; // founder paused this long mid-pitch → check whether they addressed the panel
 const MAX_FOLLOW_UPS = 2;
 const VERDICT_TIMEOUT_MS = 20_000;
@@ -104,7 +105,9 @@ export class RoomController {
   private aside: { seatId: string; remainingMs: number } | null = null;
   private intentBusy = false;
   private intentChecked = 0; // scribe text length already classified
-  private lastScribeAt = 0;
+  private lastScribeAt = 0; // last time the scribe text actually changed (it re-sends unchanged interims in silence)
+  private lastScribeText = '';
+  private lastVoiceAt = 0; // last mic chunk with speech energy
   private wrapPending = false;
   private pitchFinal: Promise<void> = Promise.resolve();
   private enteringQA = false;
@@ -200,7 +203,10 @@ export class RoomController {
 
     this.scribe = new ScribeSession(projects[0], accessToken, [this.config.startupName, ...this.config.vocabulary]);
     this.scribe.onText = (text) => {
-      this.lastScribeAt = Date.now();
+      if (text !== this.lastScribeText) {
+        this.lastScribeText = text;
+        this.lastScribeAt = Date.now();
+      }
       if (this.state.phase === 'pitch') this.caption(this.config.founderName, text.slice(-160));
     };
     this.scribe.ready.catch(() => (this.scribe = null));
@@ -327,6 +333,7 @@ export class RoomController {
   // ---------- audio routing ----------
   private routeAudio = (pcm: string, rms: number) => {
     const { phase, floorId } = this.state;
+    if (rms > SPEECH_RMS) this.lastVoiceAt = Date.now();
     if (phase === 'pitch') {
       this.scribe?.sendAudio(pcm);
       if (floorId) this.sessions.get(floorId)?.sendAudio(pcm); // aside: the investor hears follow-ups
@@ -771,7 +778,9 @@ export class RoomController {
       !this.wrapPending &&
       !this.intentBusy &&
       (this.scribe?.text.length ?? 0) > this.intentChecked &&
-      Date.now() - this.lastScribeAt >= INTENT_PAUSE_MS &&
+      // The founder paused (mic energy) and the transcript caught up — or, in a noisy room, the text stopped changing.
+      ((Date.now() - this.lastVoiceAt >= INTENT_PAUSE_MS && Date.now() - this.lastScribeAt >= 400) ||
+        Date.now() - this.lastScribeAt >= 2500) &&
       !(this.aside && this.seatState(this.aside.seatId).speaking)
     )
       void this.checkPitch();

@@ -1,0 +1,32 @@
+[08:25] Maya: Thanks Priya, that was crisp. I'll moderate. Raj, you had your hand up first, go ahead.
+[08:30] Raj: Thanks. Priya, the vision piece. Walk-ins are cold, foggy, badly lit, and stuff gets stacked three deep. What's your actual detection accuracy in a real walk-in, and how do you handle items that are hidden behind other items?
+[08:45] Priya: Yeah, great question. So, um, that's exactly why we have the weight sensors. The camera alone gets about, uh, eighty-one percent item-level accuracy in our worst kitchens and ninety-four in the clean ones. But we fuse it with shelf weight, so for anything occluded, the weight delta tells us how much left, and the camera, like, tells us roughly what. Combined, our reconciled count error is under four percent by dollar value, which is better than the human clipboard count, we measured that at about eleven percent.
+[09:20] Raj: Okay, and who calibrates the sensors when a line cook moves a shelf?
+[09:25] Priya: Um, the kit self-recalibrates every night at close when the door has been shut for thirty minutes. If it sees a big unexplained shift, it pings us and we, you know, walk them through it on a video call. It's happened, um, maybe a dozen times total.
+[09:42] Raj: Got it. That's a better answer than I expected.
+[09:45] Maya: Elena, numbers.
+[09:47] Elena: Thanks. Priya, you said the global restaurant software market is four trillion dollars. The entire global restaurant industry, the food itself, is a few trillion in sales. Software can't be bigger than the industry it sells to. Where does four trillion come from?
+[10:05] Priya: Um, yeah, so, I think, the number, uh, it's from a report we saw, and it kind of, you know, includes a lot of adjacent stuff, like, the whole food service tech ecosystem, and, um, the point is it's really big and growing, and our, like, bottom-up number is what we really focus on anyway.
+[10:25] Elena: So what is your bottom-up number?
+[10:28] Priya: So, um, roughly six hundred and sixty thousand independent locations in the US, times, uh, our price, around forty-two hundred a year, that's about two point eight billion of ARR potential in the US.
+[10:45] Elena: That's a real number, I'd lead with that and drop the four trillion. Next one: your CAC. Founder-led sales with a nine-day cycle is great, but what does it cost you to acquire a restaurant, and what's the payback?
+[11:00] Priya: Um, so, honestly, we haven't, like, fully loaded it yet because it's mostly my time. I'd say it's, you know, low. It's very efficient. Referrals are free, basically.
+[11:12] Elena: So you don't know your CAC.
+[11:15] Priya: We, uh, we don't have a fully loaded CAC number today, no. I can get you one.
+[11:20] Maya: Tom, you've been patient.
+[11:22] Tom: Ha, always. Priya, I love that you're a chef. I've eaten at a lot of places and the back of house is chaos. My question is softer: why will a chef who hates technology actually open this app every day?
+[11:35] Priya: Because it's not an app, it's three bullet points in a text message at six a.m. We, um, we measured it: eighty-eight percent of our chefs open the morning briefing at least five days a week. And the purchase order approval is one tap. We designed it for someone with, like, wet hands and no patience.
+[11:55] Tom: Love it. And the Oakland Thai place, are they a reference I could call?
+[12:00] Priya: Absolutely, the owner said she'd, um, take calls from investors.
+[12:05] Maya: Let me ask one. You mentioned Toast filed for bankruptcy last year. That's not my understanding at all. Toast is a public company. Can you clarify?
+[12:15] Priya: Oh, um, yeah, I, uh, I may have misspoken there. I think I was, like, thinking of a different company, some restaurant tech player that, um, had trouble. Toast is, you know, very much still around. Our point was that POS companies don't focus on back of house.
+[12:32] Maya: Okay. It matters because they're also your most likely integration partner, or competitor. What happens if Toast builds this?
+[12:40] Priya: Um, they could build software, but they won't put hardware in the walk-in. That's a services-heavy, messy business and it's not their model. More likely they're a channel or an acquirer. We already integrate with their API.
+[12:58] Raj: One more from me. Your hardware is at cost. What's your gross margin all-in?
+[13:05] Priya: Software gross margin is about eighty-two percent. Blended with hardware and the install visits, it's around, um, sixty-eight percent today, and it should go up as installs get, like, more self-serve.
+[13:20] Maya: Great. Okay, I think we've covered it. Let's go around for decisions. Tom?
+[13:25] Tom: I'm in. Founder-market fit is off the charts, and the product is designed for real chefs. I'd put in fifty thousand.
+[13:35] Raj: I'm in, conditionally. The sensor fusion answer was solid. I want to see accuracy data from five more messy kitchens before I wire.
+[13:45] Elena: I'm out for now. The traction is real but the four trillion number and the Toast claim tell me the deck hasn't been pressure-tested, and you don't know your CAC. Come back with unit economics and I'll take another look.
+[14:00] Maya: I'm in. I'll lead if Raj's diligence checks out. Priya, fix the market slide and kill the Toast line before your next meeting. Thanks everyone.
+[14:10] END

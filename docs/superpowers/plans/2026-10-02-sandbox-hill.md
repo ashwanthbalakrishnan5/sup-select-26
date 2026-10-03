@@ -1,14 +1,14 @@
-# PitchRoom Implementation Plan (hackathon day)
+# Sandbox Hill Implementation Plan (hackathon day)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Ship PitchRoom — a founder pitches (camera + screen share) to up to 4 Gemini Live avatar investors in a Teams-style call, then gets "I'm in / I'm out" verdicts and an analysis report — as a Next.js app on Vercel with Supabase.
+**Goal:** Ship Sandbox Hill — a founder pitches (camera + screen share) to up to 4 Gemini Live avatar investors in a Teams-style call, then gets "I'm in / I'm out" verdicts and an analysis report — as a Next.js app on Vercel with Supabase.
 
 **Architecture:** Next.js 16 App Router. The browser runs the meeting: a framework-agnostic `RoomController` state machine opens one Gemini Live avatar WebSocket per investor (us-central1, token from `/api/live-token`), a silent transcription WebSocket for the pitch (global), and routes the mic to whoever "has the floor". Text agents (fact-check, floor manager, report) run in Vercel route handlers. Supabase Postgres stores sessions; the Teams UI is the Azure Communication Services UI kit fed with our own `<video>` elements.
 
 **Tech Stack:** Next.js 16.3 · React 19.2 · TypeScript 5.9 · Tailwind 4 · neobrutalism.dev (shadcn registry, Base UI) · `@azure/communication-react` 1.35 · `@google/genai` 2.26 · `google-auth-library` 11 · `@supabase/supabase-js` 2.117 / `@supabase/ssr` 0.12 · zod 4 · pnpm 11 · Vercel.
 
-**Spec:** `docs/superpowers/specs/2026-10-02-pitchroom-design.md` (read it first — every number there was measured).
+**Spec:** `docs/superpowers/specs/2026-10-02-sandbox-hill-design.md` (read it first — every number there was measured).
 
 **Reference code:** `reference/` contains every file of the app, already verified in a scratch Next app (tsc, eslint, `next build`, 16 unit tests, real-Vertex smoke test, full e2e meetings with 1, 2 and 4 investors, leave-mid-pitch). This plan is mostly *copy, wire, verify*. Never re-derive what the reference already does; if something differs from the reference, the reference wins unless it fails a test.
 
@@ -24,7 +24,7 @@
 - The founder's camera never leaves the browser. Only screen-share frames (deduped slides) go to models.
 - Theme: neobrutalism **yellow**; font Space Grotesk; IN `#00D696`, OUT `#FF4D50`, info `#7A83FF`. Meeting screen = Teams dark (`#1f1f1f`, top bar `#292929`).
 - All route handlers `runtime = 'nodejs'`; report analysis runs in `after()` with `maxDuration = 300`.
-- Copy: product name "PitchRoom", tagline "Pitch to an AI investor panel.", CTA "Start pitch →", lobby CTA "Join meeting".
+- Copy: product name "Sandbox Hill", tagline "Pitch to an AI investor panel.", CTA "Start pitch →", lobby CTA "Join meeting".
 - Investor VAD: `silence_duration_ms 1200` + `end_of_speech_sensitivity END_SENSITIVITY_LOW`. Avatar bitrate: 1 seat 1.5 Mbps, 2 seats 1 Mbps, 3–4 seats 500 kbps.
 - Voice confidence (`voiceAnalysis`, default on): ~45 s WAV clips of voiced founder audio → `/api/delivery` (≤4 MB body).
 
@@ -40,7 +40,7 @@
 
 ## File Structure
 
-Everything under `reference/` is copied 1:1 into the app root (`pitchroom/`). Responsibilities:
+Everything under `reference/` is copied 1:1 into the app root (`sandbox-hill/`). Responsibilities:
 
 | Path | Responsibility |
 |---|---|
@@ -109,7 +109,7 @@ SUPABASE_SERVICE_ROLE_KEY=<service role key>
 ### Task 1: Scaffold the Next app with the neobrutalism theme
 
 **Files:**
-- Create: `pitchroom/` (create-next-app), `components/ui/*` (shadcn CLI), `lib/utils.ts` (CLI)
+- Create: `sandbox-hill/` (create-next-app), `components/ui/*` (shadcn CLI), `lib/utils.ts` (CLI)
 - Modify: `package.json` (scripts), `pnpm-workspace.yaml` (allowBuilds)
 
 **Interfaces:** Produces the app skeleton every later task copies into; `@/` alias → app root.
@@ -117,19 +117,19 @@ SUPABASE_SERVICE_ROLE_KEY=<service role key>
 - [ ] **Fast path (do this; Steps 1–6 below are what it automates, for debugging only)**
 
 ```bash
-sh ~/Projects/"Supabase Hackathon"/reference/scripts/bootstrap.sh ~/Projects/pitchroom
-cp ~/path/to/.env.local ~/Projects/pitchroom/.env.local   # from Task 0 Step 4
-cd ~/Projects/pitchroom && git init && git add -A && git commit -m "feat: scaffold PitchRoom from reference"
+sh ~/Projects/"Supabase Hackathon"/reference/scripts/bootstrap.sh ~/Projects/sandbox-hill
+cp ~/path/to/.env.local ~/Projects/sandbox-hill/.env.local   # from Task 0 Step 4
+cd ~/Projects/sandbox-hill && git init && git add -A && git commit -m "feat: scaffold Sandbox Hill from reference"
 ```
 Expected output ends with `ℹ pass 16`, `ℹ fail 0`, `✓ next build`, `✓ … is ready` (~35 s). Then skip to Task 2.
 
 - [ ] **Step 1: Create the app**
 
 ```bash
-cd ~/Projects && CI=1 pnpm dlx create-next-app@latest pitchroom --ts --tailwind --eslint --app --no-src-dir --import-alias "@/*" --use-pnpm --yes
-cd pitchroom
+cd ~/Projects && CI=1 pnpm dlx create-next-app@latest sandbox-hill --ts --tailwind --eslint --app --no-src-dir --import-alias "@/*" --use-pnpm --yes
+cd sandbox-hill
 ```
-Expected: `pitchroom/` with `app/`, Next 16.x, React 19.x.
+Expected: `sandbox-hill/` with `app/`, Next 16.x, React 19.x.
 
 - [ ] **Step 2: Theme + UI components**
 
@@ -184,7 +184,7 @@ Expected: no errors (lint: 1 warning in the generated `components/ui/badge.tsx`,
 - [ ] **Step 7: Commit**
 
 ```bash
-git init && git add -A && git commit -m "feat: scaffold PitchRoom from reference"
+git init && git add -A && git commit -m "feat: scaffold Sandbox Hill from reference"
 ```
 
 ---
@@ -252,7 +252,7 @@ Expected last: HTTP 400 `{"error":…}`.
 
 **Files (copied):** `app/layout.tsx`, `app/globals.css`, `app/page.tsx`, `components/app-header.tsx`, `components/config/{config-form,seat-card,pill-group}.tsx`, `public/avatars/*.jpg`
 
-**Layout contract (spec §6):** header (🦈 PitchRoom left; History/Sign in right only when Supabase public env set) → hero (H1 "Pitch to an AI investor panel.", sub "Get grilled. Get a verdict. Get better.", stacked 40px avatar circles right) → Card "Your startup" (2-col: Your name, Startup name; full-width One-liner with n/200 counter; Stage select; Raising) → Card "Session" (Pitch length pills 2–6, Q&A pills 2–4 with disabled pills + tooltip "Meetings are capped at 10 minutes", 3 switches, "Total meeting ≈ N min (max 10)") → Card "Your panel" (badge n/4, 2-col SeatCards, dashed "+ Add investor") → Accordion "Advanced" (fact-checking, record, words to listen for) → sticky footer (summary left, "Start pitch →" right).
+**Layout contract (spec §6):** header (🦈 Sandbox Hill left; History/Sign in right only when Supabase public env set) → hero (H1 "Pitch to an AI investor panel.", sub "Get grilled. Get a verdict. Get better.", stacked 40px avatar circles right) → Card "Your startup" (2-col: Your name, Startup name; full-width One-liner with n/200 counter; Stage select; Raising) → Card "Session" (Pitch length pills 2–6, Q&A pills 2–4 with disabled pills + tooltip "Meetings are capped at 10 minutes", 3 switches, "Total meeting ≈ N min (max 10)") → Card "Your panel" (badge n/4, 2-col SeatCards, dashed "+ Add investor") → Accordion "Advanced" (fact-checking, record, words to listen for) → sticky footer (summary left, "Start pitch →" right).
 
 - [ ] **Step 1: Visual check**
 
@@ -263,7 +263,7 @@ Expected: the layout above; avatars Vera (HOST), Kai, Ben, Leo; removing Kai lea
 
 Click "Start pitch →" with empty fields → toast "Check the highlighted fields" and red messages "Enter your name", "Enter your startup name", "Describe your startup in one line". Choose pitch 6 → Q&A pills 3 and 4 disabled.
 
-- [ ] **Step 3: Happy path** — fill fields → "Start pitch →" → spinner "Creating room…" → URL `/room/<uuid>`. Reload `/` → fields restored from `localStorage['pitchroom:config']`.
+- [ ] **Step 3: Happy path** — fill fields → "Start pitch →" → spinner "Creating room…" → URL `/room/<uuid>`. Reload `/` → fields restored from `localStorage['sandboxhill:config']`.
 
 - [ ] **Step 4: Commit** — `git commit -am "feat: config page"` (if changed).
 
@@ -325,7 +325,7 @@ Expected log: phases `JOINING… → INTRO → PITCH → Q&A → VERDICT`; "foun
 
 - [ ] **Step 5: Check the founder was never interrupted** — in `tests/e2e/out/session.json`, every line with `"phase":"pitch"` has `"speaker":"founder"` except at most the host's single wrap-up line after time is up.
 
-- [ ] **Step 6: Edge checks (manual)** — (a) "Leave" mid-pitch → dialog → "Leave and get report" → report generated from the partial transcript. (b) Open `/room/<new id>` in Safari → red "PitchRoom needs desktop Chrome." and Join disabled. (c) Block the mic for localhost in Chrome site settings → "PitchRoom needs your microphone." + Try again.
+- [ ] **Step 6: Edge checks (manual)** — (a) "Leave" mid-pitch → dialog → "Leave and get report" → report generated from the partial transcript. (b) Open `/room/<new id>` in Safari → red "Sandbox Hill needs desktop Chrome." and Join disabled. (c) Block the mic for localhost in Chrome site settings → "Sandbox Hill needs your microphone." + Try again.
 
 - [ ] **Step 7: Commit** — `git commit -am "feat: meeting room"`.
 
@@ -348,7 +348,7 @@ Expected log: phases `JOINING… → INTRO → PITCH → Q&A → VERDICT`; "foun
 
 **Files:** none new.
 
-- [ ] **Step 1:** `vercel link` (new project `pitchroom`), then add env vars for Production + Preview:
+- [ ] **Step 1:** `vercel link` (new project `sandbox-hill`), then add env vars for Production + Preview:
 
 ```bash
 for k in GOOGLE_SERVICE_ACCOUNT_JSON LIVE_PROJECTS TEXT_PROJECT NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY SUPABASE_SERVICE_ROLE_KEY; do

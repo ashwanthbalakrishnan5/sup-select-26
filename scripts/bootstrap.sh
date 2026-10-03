@@ -1,8 +1,8 @@
 #!/bin/sh
-# One-command PitchRoom scaffold (plan Task 1). Creates a fresh Next.js app, installs the neobrutalism theme +
+# One-command Sandbox Hill scaffold (plan Task 1). Creates a fresh Next.js app, installs the neobrutalism theme +
 # components and all dependencies, copies this reference code in, and verifies typecheck + lint + unit tests + build.
 #
-#   sh "<repo>/reference/scripts/bootstrap.sh" ~/Projects/pitchroom
+#   sh "<repo>/reference/scripts/bootstrap.sh" ~/Projects/sandbox-hill
 #
 # Then: copy your .env.local into the app (see reference/.env.example) and `pnpm dev`.
 set -e

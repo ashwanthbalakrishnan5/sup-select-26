@@ -108,10 +108,10 @@ export function Lobby({
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-[1100px] flex-col gap-6 px-6 py-8">
-      <h1 className="font-heading text-3xl font-bold">🦈 Ready to pitch {config.startupName}?</h1>
+      <h1 className="font-heading text-3xl font-bold">⛰️ Ready to pitch {config.startupName}?</h1>
       {!ok && (
         <Alert variant="destructive">
-          <AlertTitle>PitchRoom needs desktop Chrome.</AlertTitle>
+          <AlertTitle>Sandbox Hill needs desktop Chrome.</AlertTitle>
           <AlertDescription>Open this link in Google Chrome on a laptop or desktop.</AlertDescription>
         </Alert>
       )}
@@ -151,7 +151,7 @@ export function Lobby({
             </div>
             {micError && (
               <Alert variant="destructive">
-                <AlertTitle>PitchRoom needs your microphone.</AlertTitle>
+                <AlertTitle>Sandbox Hill needs your microphone.</AlertTitle>
                 <AlertDescription className="flex items-center justify-between gap-2">
                   Allow microphone access in Chrome&apos;s address bar, then try again.
                   <Button size="sm" variant="neutral" onClick={() => setAttempt((a) => a + 1)}>

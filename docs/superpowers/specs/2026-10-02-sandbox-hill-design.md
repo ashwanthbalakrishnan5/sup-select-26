@@ -1,12 +1,12 @@
-# PitchRoom — Design Spec
+# Sandbox Hill — Design Spec
 
 **Date:** 2026-10-02 · **Status:** Approved for build (owner asked for autonomous overnight build) · **Owner:** Ashwanth
 
 > "Pitch to an AI investor panel. Get grilled. Get a verdict."
 
-PitchRoom is a web app where a founder joins a video call with up to four AI investors (Gemini Live avatars), pitches uninterrupted for a fixed time while screen-sharing their slides, answers the panel's questions, hears each investor say "I'm in" or "I'm out", and then reads an analysis report.
+Sandbox Hill is a web app where a founder joins a video call with up to four AI investors (Gemini Live avatars), pitches uninterrupted for a fixed time while screen-sharing their slides, answers the panel's questions, hears each investor say "I'm in" or "I'm out", and then reads an analysis report.
 
-This spec is the single source of truth for the hackathon build. Every number in it was measured on 2026-10-02 against the real APIs (see §14, "Verified platform facts"). Working reference code for every unit lives in `reference/` and the build plan is `docs/superpowers/plans/2026-10-02-pitchroom.md`.
+This spec is the single source of truth for the hackathon build. Every number in it was measured on 2026-10-02 against the real APIs (see §14, "Verified platform facts"). Working reference code for every unit lives in `reference/` and the build plan is `docs/superpowers/plans/2026-10-02-sandbox-hill.md`.
 
 ---
 
@@ -73,7 +73,7 @@ Browser (Chrome, Next.js client)                         Vercel (Next.js route h
 | `/history` (P2) | Server page | List of the signed-in user's sessions | Neobrutalism |
 | `/login` (P2) | Client page | Supabase magic-link sign-in | Neobrutalism |
 
-Global layout (`app/layout.tsx`): `<html lang="en">`, font **Space Grotesk** (`next/font/google`, weights 400/500/700, CSS var `--font-sans`), `<body class="bg-background text-foreground antialiased">`, `<ToastProvider>` mounted once. Page title template: `%s · PitchRoom`. Favicon: 🦈 emoji SVG.
+Global layout (`app/layout.tsx`): `<html lang="en">`, font **Space Grotesk** (`next/font/google`, weights 400/500/700, CSS var `--font-sans`), `<body class="bg-background text-foreground antialiased">`, `<ToastProvider>` mounted once. Page title template: `%s · Sandbox Hill`. Favicon: 🦈 emoji SVG.
 
 Theme: neobrutalism **yellow** palette (`pnpm dlx shadcn@latest init https://neobrutalism.dev/r/styling/yellow.json`): background `hsl(54 92% 88%)`, main `hsl(49 100% 49%)`, 2px black borders, `4px 4px 0 0 #000` shadows, radius 5px. Status colors used across the app: **IN/success** `#00D696` (chart-4), **OUT/danger** `#FF4D50` (chart-3), **info** `#7A83FF` (chart-2).
 
@@ -163,7 +163,7 @@ Measured: the avatar concurrency quota is **3 per project** (`BidiGenContentConc
 Max content width 960px, centered, 24px page padding, vertical gap 24px between cards. All cards are neobrutalism `Card` (white `secondary-background`, 2px border, shadow).
 
 ### 6.1 Header (top, full width, height 64px)
-- Left: logo — 🦈 + "PitchRoom" (text-2xl, font-heading), links to `/`.
+- Left: logo — 🦈 + "Sandbox Hill" (text-2xl, font-heading), links to `/`.
 - Right (P2 only, when auth enabled): "History" (`Button variant="neutral" size="sm"`) → `/history`; "Sign in" / avatar initial.
 
 ### 6.2 Hero (below header)
@@ -212,7 +212,7 @@ Inline error text (red, text-sm) under the field after first blur / submit attem
 - Left (text-sm): "{n} investors · {pitch} min pitch · {qa} min Q&A".
 - Right: primary `Button size="lg"`: "Start pitch →". Disabled while invalid or submitting; shows spinner + "Creating room…" while submitting.
 - On click: validate → `POST /api/sessions` → on 200 `router.push('/room/{id}')`; on error toast "Couldn't create the room. Try again."
-- Last-used config is saved to `localStorage['pitchroom:config']` on submit and restored on load (wrapped in try/catch).
+- Last-used config is saved to `localStorage['sandboxhill:config']` on submit and restored on load (wrapped in try/catch).
 
 ---
 
@@ -233,7 +233,7 @@ Neobrutalism page, centered two-column layout (≥1024px), 32px gap.
   - Checklist (icons ✓): "Use headphones so investors don't hear themselves", "Open your slides in another window or tab", "Speak clearly — the panel is listening".
   - Primary `Button size="lg" className="w-full"`: **"Join meeting"**. Disabled until microphone permission granted (mic is mandatory; camera optional).
   - Under it, text-xs: "Desktop Chrome required. The call opens in full screen."
-- **Unsupported browser banner** (top, `Alert` variant destructive) when `!('MediaSource' in window)` or not Chromium: "PitchRoom needs desktop Chrome." Join disabled.
+- **Unsupported browser banner** (top, `Alert` variant destructive) when `!('MediaSource' in window)` or not Chromium: "Sandbox Hill needs desktop Chrome." Join disabled.
 - On **Join** click (user gesture): `document.documentElement.requestFullscreen()` (ignore rejection) → phase `connecting` → controller.start().
 
 ### 7.2 Meeting (phases `connecting` → `intro` → `pitch` → `qa` → `verdict`)
@@ -241,7 +241,7 @@ Full-viewport, dark Teams look (`#1f1f1f` background), rendered **client-only** 
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│ 🦈 PitchRoom · LedgerLoop          [ PITCH ]                  ● REC   03:41   │  TopBar 48px
+│ 🦈 Sandbox Hill · LedgerLoop          [ PITCH ]                  ● REC   03:41   │  TopBar 48px
 ├──────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │   ┌─────────────┐ ┌─────────────┐                                            │
@@ -261,7 +261,7 @@ Full-viewport, dark Teams look (`#1f1f1f` background), rendered **client-only** 
 ```
 
 - **TopBar** (48px, `#292929`, white text, 16px horizontal padding):
-  - Left: "🦈 PitchRoom · {startupName}" (text-sm, 600).
+  - Left: "🦈 Sandbox Hill · {startupName}" (text-sm, 600).
   - Center: phase pill (uppercase, text-xs, 2px white border, rounded-full, px-3): `JOINING…` / `INTRO` / `PITCH` / `Q&A` / `VERDICT`. Pitch pill background `#7A83FF`, Q&A `#FACC00` with black text, Verdict `#00D696` with black text.
   - Right: red dot + "REC" (only when recording) then the **timer** `mm:ss` (tabular-nums, text-lg, 700) when `showTimer`: counts down the current phase's budget during `pitch` and `qa`; hidden in intro/verdict. Color white → amber `#FACC00` at ≤60 s → red `#FF4D50` at ≤15 s.
 - **Gallery**: ACS `VideoGallery`, `layout="floatingLocalVideo"`, `localVideoTileSize="16:9"`. Remote participants = active seats in seat order:
@@ -339,7 +339,7 @@ All intro lines (host output transcription, founder input transcription from the
 
 **Ended**
 1. Stop timer, mic, slide capture, recording (P2: upload). Close every WebSocket cleanly.
-2. Flush the VoiceSampler, wait ≤8 s for in-flight delivery analyses, then `POST /api/sessions/{id}/finish` with `{ transcript, verdicts, factChecks, deliveries, handRaises, timings: {meetingStart, pitchStart, pitchEnd, qaStart, qaEnd, end}, endedBy: 'complete'|'left'|'error' }` (also saved to `sessionStorage['pitchroom:finish:{id}']` for retry). The route answers immediately (`processing`).
+2. Flush the VoiceSampler, wait ≤8 s for in-flight delivery analyses, then `POST /api/sessions/{id}/finish` with `{ transcript, verdicts, factChecks, deliveries, handRaises, timings: {meetingStart, pitchStart, pitchEnd, qaStart, qaEnd, end}, endedBy: 'complete'|'left'|'error' }` (also saved to `sessionStorage['sandboxhill:finish:{id}']` for retry). The route answers immediately (`processing`).
 3. Exit fullscreen; navigate to `/report/{id}`.
 
 **Leave mid-meeting** → skip to step "Ended" with `endedBy:'left'` (report still generated from what exists).
@@ -388,7 +388,7 @@ Then `{"realtime_input":{"activity_start":{}}}` at pitch start, 100 ms audio chu
 ### 7.6 Error handling (room)
 | Condition | Behavior |
 |---|---|
-| Mic permission denied | Lobby: Join disabled, inline alert "PitchRoom needs your microphone." + "Try again" button |
+| Mic permission denied | Lobby: Join disabled, inline alert "Sandbox Hill needs your microphone." + "Try again" button |
 | Camera denied / none | Lobby & meeting work; local tile shows initials |
 | Screen share cancelled | No-op; investors just don't see slides |
 | `/api/live-token` fails | Connecting overlay error "Couldn't reach the panel." + "Back to setup" |
@@ -403,7 +403,7 @@ Then `{"realtime_input":{"activity_start":{}}}` at pitch start, 100 ms audio chu
 | `/finish` fails | Report page shows "Report failed" + "Retry analysis" button (re-POSTs saved transcript from `sessionStorage`) |
 
 ### 7.7 Vocal confidence analysis (P1)
-**Why:** a confident founder with a confident voice is far more likely to get investors in. Gemini 3.8 Live listens to prosody internally (affective dialogue is always on and no longer configurable) but exposes **no** user-emotion/confidence output, and the investors' sessions never hear the pitch audio (only the scribe does). So PitchRoom measures it explicitly.
+**Why:** a confident founder with a confident voice is far more likely to get investors in. Gemini 3.8 Live listens to prosody internally (affective dialogue is always on and no longer configurable) but exposes **no** user-emotion/confidence output, and the investors' sessions never hear the pitch audio (only the scribe does). So Sandbox Hill measures it explicitly.
 
 **How:** VoiceSampler clips (~45 s of the founder's voiced audio) → `POST /api/delivery {wavBase64, startSec, phase, founderName}` → `gemini-3.8-flash` (global, thinking LOW) **listens to the audio** and returns `DeliveryChunk` JSON: `confidence`, `energy`, `clarity` (1–10), `pace`, `hesitations`, a one-sentence `note` an investor would notice, and ≤3 `moments` with in-clip offsets. Prompt: judge HOW they sound (steadiness, volume, pitch variation, upspeak, hesitations, fillers, long pauses, rushing, trailing off, hedging) not WHAT they say.
 
@@ -540,7 +540,7 @@ Security notes: the live access token appears in the WebSocket URL — the servi
 ## 15. Hackathon fast path (≤ 1 hour)
 | Minute | Step | Command / where |
 |---|---|---|
-| 0–1 | Scaffold + copy + verify (typecheck, lint, 16 unit tests, build) — measured **34 s** | `sh reference/scripts/bootstrap.sh ~/Projects/pitchroom` |
+| 0–1 | Scaffold + copy + verify (typecheck, lint, 16 unit tests, build) — measured **34 s** | `sh reference/scripts/bootstrap.sh ~/Projects/sandbox-hill` |
 | 1–10 | Service account key, Supabase project + migration, `.env.local` | plan Task 0 |
 | 10–15 | `pnpm smoke` (real Vertex) + `pnpm dev` → one 1-investor meeting | plan Tasks 3, 7 |
 | 15–30 | Vercel project + env + deploy, prod smoke | plan Task 9 |

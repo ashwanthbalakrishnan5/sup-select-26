@@ -20,7 +20,7 @@ import type { SessionConfig, Stage } from '@/lib/types';
 import { PillGroup } from './pill-group';
 import { SeatCard } from './seat-card';
 
-const STORAGE_KEY = 'pitchroom:config';
+const STORAGE_KEY = 'sandboxhill:config';
 
 export function loadSavedConfig(): SessionConfig | null {
   try {

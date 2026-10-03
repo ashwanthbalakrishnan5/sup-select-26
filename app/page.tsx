@@ -1,4 +1,4 @@
-// Landing page: what PitchRoom is, how it works for each side, pricing, and the two entry points.
+// Landing page: what Sandbox Hill is, how it works for each side, pricing, and the two entry points.
 import { ArrowRight, BarChart3, Link2, Mic, ShieldCheck, SlidersHorizontal, Video } from 'lucide-react';
 import Link from 'next/link';
 import { AppHeader } from '@/components/app-header';
@@ -48,6 +48,7 @@ export default async function Landing() {
         {/* Hero */}
         <section className="flex flex-col items-start gap-8 pt-10 md:flex-row md:items-center md:justify-between">
           <div className="flex max-w-xl flex-col gap-5">
+            <span className="self-start rounded-base border-2 border-border bg-main px-3 py-1 text-sm font-bold">Sand Hill, before Sand Hill.</span>
             <h1 className="font-heading text-5xl font-bold leading-tight md:text-6xl">The first round, run by AI investors.</h1>
             <p className="text-xl">
               VCs send one link and every startup gets a live video interview with an AI investor panel. Founders practice with the
@@ -73,14 +74,20 @@ export default async function Landing() {
         {/* How it works */}
         <section className="grid gap-10 md:grid-cols-2">
           <div className="flex flex-col gap-4">
-            <h2 className="text-3xl font-bold">For investors</h2>
+            <div>
+              <h2 className="text-3xl font-bold">For investors</h2>
+              <p className="mt-1 font-bold">Your first-round partners, on call for every startup.</p>
+            </div>
             <Steps steps={INVESTOR_STEPS} />
             <Button className="self-start" nativeButton={false} render={<Link href={investorHref} />}>
               Build a panel <ArrowRight />
             </Button>
           </div>
           <div className="flex flex-col gap-4">
-            <h2 className="text-3xl font-bold">For founders</h2>
+            <div>
+              <h2 className="text-3xl font-bold">For founders</h2>
+              <p className="mt-1 font-bold">Pitch the hill before you climb it.</p>
+            </div>
             <Steps steps={FOUNDER_STEPS} />
             <Button className="self-start" variant="neutral" nativeButton={false} render={<Link href={founderHref} />}>
               Start practicing <ArrowRight />

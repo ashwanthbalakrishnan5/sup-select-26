@@ -1,4 +1,4 @@
--- PitchRoom: one row per pitch meeting. All writes go through the Next.js server with the service-role key.
+-- Sandbox Hill: one row per pitch meeting. All writes go through the Next.js server with the service-role key.
 create table if not exists public.pitch_sessions (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),

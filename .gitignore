@@ -40,7 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# PitchRoom
+# Sandbox Hill
 !.env.example
 .data/
 tests/e2e/out/

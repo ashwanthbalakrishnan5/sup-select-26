@@ -10,10 +10,10 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: { default: 'PitchRoom', template: '%s · PitchRoom' },
-  description: 'Pitch to an AI investor panel. Get grilled. Get a verdict.',
+  title: { default: 'Sandbox Hill', template: '%s · Sandbox Hill' },
+  description: 'Sand Hill, before Sand Hill. AI investor panels run live first-round interviews for VCs and practice pitches for founders.',
   icons: {
-    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦈</text></svg>",
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛰️</text></svg>",
   },
 };
 

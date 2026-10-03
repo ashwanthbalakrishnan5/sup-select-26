@@ -727,7 +727,7 @@ export class RoomController {
       endedBy,
     };
     try {
-      sessionStorage.setItem(`pitchroom:finish:${this.sessionId}`, JSON.stringify(payload));
+      sessionStorage.setItem(`sandboxhill:finish:${this.sessionId}`, JSON.stringify(payload));
     } catch {}
     try {
       await api.finishSession(this.sessionId, payload);

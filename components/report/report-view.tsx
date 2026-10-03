@@ -59,7 +59,7 @@ export function ReportView({ initial, audience = 'founder' }: { initial: Rec; au
     setBusy(true);
     try {
       // If the meeting never reached the server, re-send the copy saved in this tab.
-      const saved = s.transcript ? null : sessionStorage.getItem(`pitchroom:finish:${s.id}`);
+      const saved = s.transcript ? null : sessionStorage.getItem(`sandboxhill:finish:${s.id}`);
       await api.finishSession(s.id, saved ? JSON.parse(saved) : { retry: true });
       setS({ ...s, status: 'processing', error: null });
     } catch {

@@ -36,7 +36,7 @@ export function TopBar({
 
   return (
     <div className="grid h-12 shrink-0 grid-cols-3 items-center bg-[#292929] px-4">
-      <div className="truncate text-sm font-semibold">🦈 PitchRoom · {startupName}</div>
+      <div className="truncate text-sm font-semibold">⛰️ Sandbox Hill · {startupName}</div>
       <div className="flex justify-center">
         {pill && <span className={`rounded-full border-2 px-3 py-0.5 text-xs font-bold tracking-wide ${pill.style}`}>{pill.label}</span>}
       </div>

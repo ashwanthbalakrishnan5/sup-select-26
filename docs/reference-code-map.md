@@ -1,9 +1,9 @@
-# PitchRoom — reference code
+# Sandbox Hill — reference code
 
-Working, verified code for every part of PitchRoom, laid out exactly like the Next.js app it gets copied into.
-Spec: `../docs/superpowers/specs/2026-10-02-pitchroom-design.md` · Build plan: `../docs/superpowers/plans/2026-10-02-pitchroom.md`.
+Working, verified code for every part of Sandbox Hill, laid out exactly like the Next.js app it gets copied into.
+Spec: `../docs/superpowers/specs/2026-10-02-sandbox-hill-design.md` · Build plan: `../docs/superpowers/plans/2026-10-02-sandbox-hill.md`.
 
-**Fastest path:** `sh scripts/bootstrap.sh ~/Projects/pitchroom` → a fresh Next app with the theme, components,
+**Fastest path:** `sh scripts/bootstrap.sh ~/Projects/sandbox-hill` → a fresh Next app with the theme, components,
 dependencies and all of this code, verified (typecheck, lint, 16 unit tests, build) in ~35 s. Add `.env.local`, done.
 
 Verified 2026-10-02/03: `tsc` + `eslint` clean, `next build` clean, 16/16 unit tests, server smoke test against real
@@ -15,7 +15,7 @@ leave-mid-pitch run — the last one on an app created by `bootstrap.sh`. Screen
 ```
 app/
   layout.tsx                    Space Grotesk font, <Toaster>, metadata
-  globals.css                   neobrutalism yellow theme (generated) + PitchRoom additions (.meeting-root, .tabular)
+  globals.css                   neobrutalism yellow theme (generated) + Sandbox Hill additions (.meeting-root, .tabular)
   page.tsx                      "/" config page (server) → components/config/config-form.tsx
   room/[id]/page.tsx            loads session → components/room/room.tsx
   report/[id]/page.tsx          loads session → components/report/report-view.tsx

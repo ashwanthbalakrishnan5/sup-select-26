@@ -1,6 +1,6 @@
 # Gemini Live Avatar
 
-Verified working on 2026-10-02. Full design: `docs/superpowers/specs/2026-10-02-pitchroom-design.md`; working code: `reference/lib/live/`.
+Verified working on 2026-10-02. Full design: `docs/superpowers/specs/2026-10-02-sandbox-hill-design.md`; working code: `reference/lib/live/`.
 
 ## Setup
 
@@ -57,7 +57,7 @@ Python SDK equivalent: `types.LiveConnectConfig(response_modalities=["VIDEO"], s
 - Clean or abrupt client close both release the slot immediately.
 - Pricing: avatar video output $1 / 1M tokens at 6,192 tokens per speaking second (~$0.37/min); idle not billed.
 - Default VAD ends a user turn on 0.44 s pauses → use `realtime_input_config.automatic_activity_detection: { silence_duration_ms: 1200, end_of_speech_sensitivity: 'END_SENSITIVITY_LOW' }`.
-- Proactive audio is permanently on (the model may choose not to answer); affective dialogue is internal — **no API reports the user's emotion or confidence**. PitchRoom measures vocal confidence separately (`reference/lib/server/delivery.ts`).
+- Proactive audio is permanently on (the model may choose not to answer); affective dialogue is internal — **no API reports the user's emotion or confidence**. Sandbox Hill measures vocal confidence separately (`reference/lib/server/delivery.ts`).
 - A `turn_complete: true` client turn interrupts an active generation; after `interrupted` the server sends a bare `turnComplete`.
 - Browser: `?access_token=` on the WSS URL works; MSE codec `video/mp4; codecs="avc1.42C020, mp4a.40.2"`.
 

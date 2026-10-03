@@ -1,10 +1,18 @@
-# PitchRoom
+# Sandbox Hill
 
-Pitch to an AI investor panel. A founder joins a Teams-style video call with up to four Gemini Live avatar
-investors, pitches uninterrupted while screen-sharing, answers the panel's questions, hears each investor say
-"I'm in" or "I'm out", and gets an analysis report — including how confident they sounded.
+**Sand Hill, before Sand Hill.** AI investor panels that run live, first-round video interviews.
 
-Next.js 16 · React 19 · Tailwind 4 + neobrutalism.dev · Supabase · Vertex AI (Gemini 3.8 Live avatars) · Vercel
+- **Investors** describe their fund in plain English and Claude builds the panel: up to four Gemini Live avatar
+  investors, each with custom instructions, must-ask questions and scoring criteria. One invite link goes to every
+  startup; each interview produces a report (criteria scores, fact-checked claims, voice confidence and emotion
+  signals, "I'm in / I'm out" verdicts, recording), and a Claude shortlist agent ranks the whole batch — re-ranked
+  automatically through a Supabase Queue after every interview.
+- **Founders** practice the same Teams-style call: screen-share the deck, pitch uninterrupted, get grilled by
+  investors with different personalities, hear the verdicts and get a report on what to fix.
+
+Live: https://sup-select-26.vercel.app
+
+Next.js 16 · React 19 · Tailwind 4 + neobrutalism.dev · Supabase (Postgres, Storage, Queues, Compute) · Vertex AI (Gemini 3.8 Live avatars) · Claude Sonnet 5.5 · Vercel
 
 ## Run locally
 
@@ -38,7 +46,7 @@ pnpm e2e                                    # full meeting in Chrome (app on :39
 
 ## Docs
 
-- `docs/superpowers/specs/2026-10-02-pitchroom-design.md` — product spec (every page, flow and measured number)
-- `docs/superpowers/plans/2026-10-02-pitchroom.md` — build plan
+- `docs/superpowers/specs/2026-10-02-sandbox-hill-design.md` — product spec (every page, flow and measured number)
+- `docs/superpowers/plans/2026-10-02-sandbox-hill.md` — build plan
 - `docs/reference-code-map.md` — file map + hard-won platform facts
 - `docs/screenshots/` — every screen

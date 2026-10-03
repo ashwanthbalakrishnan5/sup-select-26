@@ -15,7 +15,7 @@ export function AppHeader({ user }: { user?: DemoUser | null }) {
   return (
     <header className="mx-auto flex h-16 w-full max-w-[1100px] items-center justify-between px-6">
       <Link href="/" className="font-heading text-2xl font-bold tracking-tight">
-        🦈 PitchRoom
+        ⛰️ Sandbox Hill
       </Link>
       <nav className="flex items-center gap-2">
         {user ? (

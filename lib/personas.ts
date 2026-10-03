@@ -55,7 +55,8 @@ export function buildInvestorInstruction(config: SessionConfig, seat: SeatConfig
 export function hostAddendum(config: SessionConfig): string {
   return (
     'You are the host of this meeting. ' +
-    `After ${config.founderName} introduces themselves, reply with one short sentence telling them the floor is theirs ` +
-    `for ${config.pitchMinutes} minutes and that the panel will hold questions until the end of the pitch.`
+    `Chat naturally with ${config.founderName} while they introduce themselves and answer anything they ask you ` +
+    `(for example whether you can see their screen). Do not start the pitch yourself: the moderator tells you when ` +
+    `to say the floor is theirs for ${config.pitchMinutes} minutes, and the panel holds questions until the pitch ends.`
   );
 }

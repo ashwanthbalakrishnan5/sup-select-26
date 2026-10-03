@@ -89,7 +89,7 @@ export const DEFAULT_CONFIG: SessionConfig = {
   voiceAnalysis: true,
   record: false,
   vocabulary: [],
-  seats: (['Vera', 'Kai', 'Ben', 'Leo'] as AvatarName[]).map((a, i) => seatFor(i, a)),
+  seats: (['Jay', 'Vera', 'Sam', 'Kira'] as AvatarName[]).map((a, i) => seatFor(i, a)), // photoreal demo panel, Jay hosts
 };
 
 /** Re-number seat ids and force seat 1 to be the host after add/remove. */

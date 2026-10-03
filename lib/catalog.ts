@@ -9,13 +9,17 @@ export interface AvatarInfo {
   defaultVoice: string;
 }
 
-// The only prebuilt avatars that exist (probed 160 names). Order = default panel order.
+// Prebuilt avatars that exist (probed ~530 names; Jay, Vera, Sam, Kira are photoreal). Photoreal first.
 export const AVATARS: AvatarInfo[] = [
+  { name: 'Jay', image: '/avatars/Jay.jpg', look: 'Grey suit, blue tie', defaultArchetype: 'numbers', defaultVoice: 'Iapetus' },
   { name: 'Vera', image: '/avatars/Vera.jpg', look: 'Silver bob, black high-neck', defaultArchetype: 'chair', defaultVoice: 'Kore' },
+  { name: 'Sam', image: '/avatars/Sam.jpg', look: 'Beard, glasses, tweed blazer', defaultArchetype: 'technical', defaultVoice: 'Sadaltager' },
+  { name: 'Kira', image: '/avatars/Kira.jpg', look: 'Curly hair, navy work jacket', defaultArchetype: 'angel', defaultVoice: 'Aoede' },
   { name: 'Kai', image: '/avatars/Kai.jpg', look: 'Young, sunglasses on head', defaultArchetype: 'technical', defaultVoice: 'Puck' },
   { name: 'Ben', image: '/avatars/Ben.jpg', look: 'Young, beard, olive jacket', defaultArchetype: 'numbers', defaultVoice: 'Charon' },
   { name: 'Leo', image: '/avatars/Leo.jpg', look: 'Older, beret and scarf', defaultArchetype: 'angel', defaultVoice: 'Algieba' },
   { name: 'Paul', image: '/avatars/Paul.jpg', look: 'Senior, suit and tie', defaultArchetype: 'shark', defaultVoice: 'Algenib' },
+  { name: 'Carmen', image: '/avatars/Carmen.jpg', look: 'Grey bun, glasses, paisley scarf', defaultArchetype: 'chair', defaultVoice: 'Gacrux' },
 ];
 
 export const avatarInfo = (name: AvatarName): AvatarInfo => AVATARS.find((a) => a.name === name)!;

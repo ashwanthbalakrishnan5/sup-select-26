@@ -104,7 +104,7 @@ test('seat add/remove keeps ids sequential and seat 1 as host', () => {
     ['seat-1', 'seat-2', 'seat-3'],
   );
   assert.equal(removed[0].archetype, 'chair');
-  assert.equal(removed[0].avatar, 'Kai');
+  assert.equal(removed[0].avatar, 'Vera');
   const added = addSeat(removed);
   assert.equal(added.length, 4);
   assert.equal(new Set(added.map((s) => s.avatar)).size, 4);
@@ -150,9 +150,9 @@ test('transcript formatting', () => {
 
 test('investor instruction carries persona, startup, roster and room protocol', () => {
   const host = buildInvestorInstruction(valid, valid.seats[0], true);
-  assert.match(host, /You are Vera, Lead Partner/);
+  assert.match(host, /You are Jay, Lead Partner/);
   assert.match(host, /Mise AI/);
-  assert.match(host, /Kai \(Technical Partner\)/);
+  assert.match(host, /Sam \(Technical Partner\)/);
   assert.ok(host.includes(ROOM_PROTOCOL));
   assert.match(host, /floor is theirs for 4 minutes/);
   const guest = buildInvestorInstruction(valid, valid.seats[1], false);

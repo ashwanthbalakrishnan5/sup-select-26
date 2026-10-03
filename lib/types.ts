@@ -2,7 +2,7 @@
 
 export type Stage = 'pre-seed' | 'seed' | 'series-a' | 'series-b+';
 export type Toughness = 'gentle' | 'balanced' | 'brutal';
-export type AvatarName = 'Vera' | 'Paul' | 'Kai' | 'Ben' | 'Leo';
+export type AvatarName = 'Vera' | 'Paul' | 'Kai' | 'Ben' | 'Leo' | 'Sam' | 'Kira' | 'Jay' | 'Carmen';
 export type ArchetypeId = 'chair' | 'technical' | 'numbers' | 'angel' | 'shark';
 export type Phase = 'lobby' | 'connecting' | 'intro' | 'pitch' | 'qa' | 'verdict' | 'ended';
 export type SessionStatus = 'created' | 'live' | 'processing' | 'ready' | 'failed';

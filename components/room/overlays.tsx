@@ -58,11 +58,22 @@ export function ConnectingOverlay({ state, onBack }: { state: RoomState; onBack:
   );
 }
 
-export function EndedOverlay() {
+export function EndedOverlay({ submitted }: { submitted?: boolean }) {
   return (
     <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-4 bg-[#1f1f1f]/95">
       <Loader2 className="size-10 animate-spin" />
-      <p className="text-xl font-semibold">That&apos;s a wrap. Generating your report…</p>
+      <p className="text-xl font-semibold">{submitted ? "That's a wrap. Submitting your interview…" : "That's a wrap. Generating your report…"}</p>
+    </div>
+  );
+}
+
+/** Interview panels: the investors give their verdicts privately (muted, hidden) — they go only to the VC. */
+export function DeliberatingOverlay() {
+  return (
+    <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-[#1f1f1f]/95 text-center">
+      <Loader2 className="size-10 animate-spin" />
+      <p className="text-xl font-semibold">The panel is taking a moment to confer privately…</p>
+      <p className="text-sm text-white/70">They&apos;ll be right back to wrap up.</p>
     </div>
   );
 }

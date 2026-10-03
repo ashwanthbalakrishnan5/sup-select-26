@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { startScreenShare } from '@/lib/live/slides';
 import type { RoomController, RoomState } from '@/lib/room/controller';
 import type { SessionConfig } from '@/lib/types';
-import { Captions, ConnectingOverlay, EndedOverlay, LeaveDialog } from './overlays';
+import { Captions, ConnectingOverlay, DeliberatingOverlay, EndedOverlay, LeaveDialog } from './overlays';
 import { TopBar } from './top-bar';
 
 registerIcons({ icons: DEFAULT_COMPONENT_ICONS });
@@ -54,6 +54,7 @@ export function Meeting({
   camOn,
   onCamOn,
   recording,
+  mediaRef,
   onBackToSetup,
 }: {
   controller: RoomController;
@@ -63,6 +64,7 @@ export function Meeting({
   camOn: boolean;
   onCamOn: (on: boolean) => void;
   recording: boolean;
+  mediaRef: { current: { camera: HTMLVideoElement | null; share: HTMLVideoElement | null } };
   onBackToSetup: () => void;
 }) {
   const [cam] = useState(() => new VideoBox('cover'));
@@ -72,6 +74,9 @@ export function Meeting({
   const { phase } = state;
 
   useEffect(() => cam.setStream(camera), [cam, camera]);
+  useEffect(() => {
+    mediaRef.current = { camera: camOn && camera ? cam.video : null, share: shareStream ? share.video : null };
+  }, [mediaRef, cam, share, camera, camOn, shareStream]);
 
   async function toggleShare() {
     if (shareStream) return stopShare();
@@ -147,7 +152,8 @@ export function Meeting({
             showMuteIndicator
           />
           {(phase === 'connecting' || state.error) && <ConnectingOverlay state={state} onBack={onBackToSetup} />}
-          {phase === 'ended' && <EndedOverlay />}
+          {state.deliberating && <DeliberatingOverlay />}
+          {phase === 'ended' && <EndedOverlay submitted={!!config.panel} />}
           <LeaveDialog
             open={leaveOpen}
             onStay={() => setLeaveOpen(false)}

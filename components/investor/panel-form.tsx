@@ -243,7 +243,7 @@ export function PanelForm({ initial, panelId }: { initial: PanelConfig; panelId?
             <div className="grid gap-x-8 md:grid-cols-2">
               <ToggleRow label="Voice confidence & emotions" help="Analyze how confident, nervous or composed the founder sounds." checked={config.voiceAnalysis} onChange={(v) => set('voiceAnalysis', v)} />
               <ToggleRow label="Live fact-checking" help="Panel checks the founder's claims on the web during the pitch." checked={config.factCheck} onChange={(v) => set('factCheck', v)} />
-              <ToggleRow label="Record the interview" help="Founders are asked to share their tab; the video is in your report." checked={config.record} onChange={(v) => set('record', v)} />
+              <ToggleRow label="Record the interview" help="A video of the call (panel, founder camera, shared screen) is in your report." checked={config.record} onChange={(v) => set('record', v)} />
               <ToggleRow label="Show timer" help="Countdown in the call." checked={config.showTimer} onChange={(v) => set('showTimer', v)} />
               <ToggleRow label="1-minute warning" help="Heads-up when one minute is left." checked={config.oneMinuteWarning} onChange={(v) => set('oneMinuteWarning', v)} />
               <ToggleRow label="Live captions" help="Captions at the bottom of the call." checked={config.captions} onChange={(v) => set('captions', v)} />

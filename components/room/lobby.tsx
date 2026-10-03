@@ -208,7 +208,7 @@ export function Lobby({
           <Button size="lg" className="w-full" disabled={!ok || !micReady} onClick={() => onJoin(micOn)}>
             Join meeting
           </Button>
-          <p className="text-xs">Desktop Chrome required. The call opens in full screen.</p>
+          <p className="text-xs">Desktop Chrome required.</p>
         </div>
       </div>
     </main>

@@ -2,8 +2,15 @@
 import { DHASH_H, DHASH_W, SlideDeduper, dhash } from './dhash';
 import type { Slide } from '../types';
 
+/** Native meeting-style picker: Chrome tab, window or entire screen; switch tabs mid-share; never this meeting tab. */
 export async function startScreenShare(): Promise<MediaStream> {
-  return navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 5 }, audio: false });
+  return navigator.mediaDevices.getDisplayMedia({
+    video: { frameRate: 15 },
+    audio: false,
+    selfBrowserSurface: 'exclude',
+    surfaceSwitching: 'include',
+    monitorTypeSurfaces: 'include',
+  } as DisplayMediaStreamOptions);
 }
 
 export class SlideCapture {

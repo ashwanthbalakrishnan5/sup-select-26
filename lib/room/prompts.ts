@@ -9,7 +9,22 @@ export const moderator = {
     `then ask them to introduce themselves briefly.`,
 
   handOff: (c: SessionConfig) =>
-    `[Moderator]: Tell ${c.founderName} in one sentence that the floor is theirs for ${c.pitchMinutes} minutes.`,
+    `[Moderator]: Tell ${c.founderName} that the floor is theirs for ${c.pitchMinutes} minutes, and that they can click ` +
+    `"Share" at the bottom of the screen to show their presentation or a demo. Two short sentences.`,
+
+  introReply: (c: SessionConfig) =>
+    `[Moderator]: ${c.founderName} finished speaking. Reply naturally in one or two short sentences (answer any ` +
+    `question they asked). Do not start the pitch yet.`,
+
+  /** Mid-pitch: the founder put a question to this investor. */
+  aside: (c: SessionConfig, seat: SeatConfig, question: string) =>
+    `[Moderator]: ${c.founderName} paused the pitch and asked you, ${seat.avatar}: "${question}". Answer in one or ` +
+    `two short sentences, then invite them to carry on. If they ask a follow-up, answer it briefly. When they go ` +
+    `back to pitching, stay completely silent.`,
+
+  backToPitch: (c: SessionConfig) =>
+    `[Moderator]: ${c.founderName} is pitching again. Stay completely silent and keep listening until you are ` +
+    `given the floor.`,
 
   timeUp: (c: SessionConfig) =>
     `[Moderator]: Time is up. Politely stop ${c.founderName}, thank them in one sentence, and say the panel will now ask questions.`,
@@ -34,6 +49,17 @@ export const moderator = {
     `[Moderator]: Q&A is over. ${seat.avatar}, give your decision now. Start with exactly "I'm in" or "I'm out", ` +
     `then give one or two sentences on why. Do not ask questions.` +
     (isLast ? ` Then thank ${c.founderName} and close the meeting in one sentence.` : ''),
+
+  /** Interview panels: verdicts are given privately (the founder's call is muted) and go only to the VC. */
+  privateVerdict: (c: SessionConfig, seat: SeatConfig) =>
+    `[Moderator]: Q&A is over. ${c.founderName} has been muted and cannot hear this — this is a private note for ` +
+    `the partners of ${c.panel?.fundName ?? 'the fund'}. ${seat.avatar}, give your decision now. Start with exactly ` +
+    `"I'm in" or "I'm out", then give one or two sentences on why. Do not ask questions.`,
+
+  privateClose: (c: SessionConfig) =>
+    `[Moderator]: ${c.founderName} can hear you again. Thank them warmly for their time in one or two sentences and ` +
+    `say the partners at ${c.panel?.fundName ?? 'the fund'} will review the interview and be in touch. Do NOT reveal ` +
+    `or hint at any decision, score or opinion.`,
 
   newHost: (c: SessionConfig) =>
     `[Moderator]: The host could not join, so you are now hosting this meeting. Keep the same lane, and follow the ` +

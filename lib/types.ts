@@ -251,6 +251,14 @@ export interface SeatBrief {
 export interface HandsDecision {
   hand_raises: { investor: string; question: string }[];
 }
+/** Pitch-flow decision (intro → pitch, mid-pitch questions, end of pitch). */
+export interface IntentDecision {
+  action: 'wait' | 'start_pitch' | 'continue' | 'ask' | 'done';
+  investor: string;
+  question: string;
+  reason: string;
+}
+
 export interface TurnDecision extends HandsDecision {
   thread_finished: boolean;
   next_speaker: string;

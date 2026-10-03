@@ -20,7 +20,7 @@ export class AvatarPlayer {
     this.video = document.createElement('video');
     this.video.playsInline = true;
     this.video.autoplay = true;
-    this.video.style.cssText = 'width:100%;height:100%;object-fit:cover;background:#000';
+    this.video.style.cssText = 'width:100%;height:100%;object-fit:contain;background:#000'; // never crop the face
     this.video.src = URL.createObjectURL(this.ms);
     this.element = document.createElement('div');
     this.element.style.cssText = 'width:100%;height:100%';

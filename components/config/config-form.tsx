@@ -305,7 +305,7 @@ export function ConfigForm() {
                 />
                 <ToggleRow
                   label="Record the meeting"
-                  help="Saves a video of the call to your report. Chrome will ask to share this tab."
+                  help="Saves a video of the call (panel, your camera and anything you share) to your report."
                   checked={config.record}
                   onChange={(v) => set('record', v)}
                 />

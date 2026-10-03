@@ -48,6 +48,7 @@ export interface RoomState {
   caption: { name: string; text: string; at: number } | null;
   micMuted: boolean;
   sharing: boolean;
+  deliberating: boolean; // interview panels: private verdicts, founder can't see or hear the panel
   error: string | null;
 }
 
@@ -56,7 +57,8 @@ export type NoticeKind = 'info' | 'warning' | 'error';
 const SEAT_STAGGER_MS = 400; // never open avatar sessions in a burst (quota lockout)
 const CONNECT_TIMEOUT_MS = 20_000;
 const CHUNK_MS = 60_000;
-const INTRO_CAP_MS = 60_000;
+const INTRO_CAP_MS = 120_000; // the intro is conversational now; the flow model hands over when the founder is ready
+const INTENT_PAUSE_MS = 1200; // founder paused this long mid-pitch → check whether they addressed the panel
 const MAX_FOLLOW_UPS = 2;
 const VERDICT_TIMEOUT_MS = 20_000;
 const MAX_PACKET_SLIDES = 12;
@@ -98,6 +100,11 @@ export class RoomController {
   private hostTurns = 0;
   private founderSpokeInIntro = false;
   private pendingPitchStart = false;
+  /** Mid-pitch aside: an investor answers a question the founder put to the panel; the pitch clock is paused. */
+  private aside: { seatId: string; remainingMs: number } | null = null;
+  private intentBusy = false;
+  private intentChecked = 0; // scribe text length already classified
+  private lastScribeAt = 0;
   private wrapPending = false;
   private pitchFinal: Promise<void> = Promise.resolve();
   private enteringQA = false;
@@ -146,6 +153,7 @@ export class RoomController {
       caption: null,
       micMuted: false,
       sharing: false,
+      deliberating: false,
       error: null,
     };
     this.mic.onChunk = this.routeAudio;
@@ -192,6 +200,7 @@ export class RoomController {
 
     this.scribe = new ScribeSession(projects[0], accessToken, [this.config.startupName, ...this.config.vocabulary]);
     this.scribe.onText = (text) => {
+      this.lastScribeAt = Date.now();
       if (this.state.phase === 'pitch') this.caption(this.config.founderName, text.slice(-160));
     };
     this.scribe.ready.catch(() => (this.scribe = null));
@@ -268,7 +277,7 @@ export class RoomController {
 
   // ---------- transcript ----------
   private caption(name: string, text: string) {
-    if (this.config.captions && text) this.set({ caption: { name, text, at: Date.now() } });
+    if (this.config.captions && text && !this.state.deliberating) this.set({ caption: { name, text, at: Date.now() } });
   }
 
   private pushLine(speaker: string, name: string, text: string, t: number, phase: Phase = this.state.phase) {
@@ -317,8 +326,10 @@ export class RoomController {
   // ---------- audio routing ----------
   private routeAudio = (pcm: string, rms: number) => {
     const { phase, floorId } = this.state;
-    if (phase === 'pitch') this.scribe?.sendAudio(pcm);
-    else if ((phase === 'intro' || phase === 'qa') && floorId) this.sessions.get(floorId)?.sendAudio(pcm);
+    if (phase === 'pitch') {
+      this.scribe?.sendAudio(pcm);
+      if (floorId) this.sessions.get(floorId)?.sendAudio(pcm); // aside: the investor hears follow-ups
+    } else if ((phase === 'intro' || phase === 'qa') && floorId) this.sessions.get(floorId)?.sendAudio(pcm);
     else return; // nobody is listening → nothing to analyze either
     if (this.config.voiceAnalysis && phase !== 'intro') {
       const clip = this.voice.push(pcm, rms, this.clock());
@@ -375,7 +386,7 @@ export class RoomController {
     this.nudgeTimer = null;
     const s = this.sessions.get(id);
     if (!s || id !== this.state.floorId || this.seatState(id).speaking || !s.pendingFounderText) return;
-    if (this.state.phase === 'intro') s.prompt(moderator.handOff(this.config));
+    if (this.state.phase === 'intro') s.prompt(this.pendingPitchStart ? moderator.handOff(this.config) : moderator.introReply(this.config));
     else if (this.state.phase === 'qa') s.prompt(moderator.respond(this.config, this.seatState(id).seat));
   }
 
@@ -390,9 +401,14 @@ export class RoomController {
     this.slideCapture = new SlideCapture(shareVideo, this.clock);
     this.slideCapture.onSlide = (slide) => {
       this.slides.push(slide);
-      if (this.state.phase === 'qa') {
+      const { phase, hostId, floorId } = this.state;
+      if (phase === 'qa') {
         for (const s of this.activeSeats())
           this.sessions.get(s.seat.id)?.addContext('[Scribe] New slide shown:', [slide.jpegBase64]);
+      } else if (phase === 'intro' && hostId) {
+        this.sessions.get(hostId)?.addContext(`[Scribe] ${this.config.founderName} is sharing their screen. It shows:`, [slide.jpegBase64]);
+      } else if (phase === 'pitch' && floorId) {
+        this.sessions.get(floorId)?.addContext('[Scribe] New slide shown:', [slide.jpegBase64]);
       }
     };
     this.slideCapture.start();
@@ -420,10 +436,37 @@ export class RoomController {
 
   private onHostIntroTurn() {
     this.hostTurns++;
-    if (this.pendingPitchStart || (this.hostTurns >= 2 && this.founderSpokeInIntro)) return this.enterPitch();
+    if (this.pendingPitchStart) return this.enterPitch();
     if (this.hostTurns === 1) {
       this.set({ floorId: this.state.hostId }); // founder introduces themselves to the host
       this.introTimer = setTimeout(() => this.skipIntro(), INTRO_CAP_MS);
+    } else if (this.founderSpokeInIntro) void this.checkIntro();
+  }
+
+  /** After each host reply in the intro: is the founder done introducing themselves with nothing left open? */
+  private async checkIntro() {
+    const intro = this.transcript.filter((l) => l.phase === 'intro');
+    const last = intro.slice(-2).map((l) => `${l.name}: ${l.text}`).join('\n');
+    const d = await this.intent('intro', last, intro.slice(0, -2).map((l) => `${l.name}: ${l.text}`).join('\n'));
+    if (d?.action === 'start_pitch' && this.state.phase === 'intro') this.skipIntro();
+  }
+
+  private async intent(phase: 'intro' | 'pitch' | 'aside', latest: string, context: string) {
+    if (this.intentBusy) return null;
+    this.intentBusy = true;
+    try {
+      return await api.floorIntent({
+        phase,
+        seats: this.briefs(),
+        host: this.name(this.state.hostId!),
+        founder: this.config.founderName,
+        latest,
+        context: context.slice(-6000),
+      });
+    } catch {
+      return null;
+    } finally {
+      this.intentBusy = false;
     }
   }
 
@@ -444,9 +487,55 @@ export class RoomController {
     this.set({ phase: 'pitch', floorId: null, phaseEndsAt: Date.now() + this.config.pitchMinutes * 60_000 });
   }
 
+  /** Founder paused mid-pitch: did they put a question to the panel, finish the pitch, or (in an aside) resume? */
+  private async checkPitch() {
+    const text = this.scribe?.text ?? '';
+    const latest = text.slice(this.intentChecked).trim();
+    this.intentChecked = text.length;
+    if (!latest) return;
+    const asideLines = this.aside
+      ? this.transcript.filter((l) => l.phase === 'pitch' && l.speaker !== 'founder').slice(-2).map((l) => `${l.name}: ${l.text}`)
+      : [];
+    const d = await this.intent(this.aside ? 'aside' : 'pitch', latest, [text.slice(0, -latest.length).slice(-3000), ...asideLines].join('\n'));
+    if (!d || this.state.phase !== 'pitch' || this.wrapPending) return;
+    if (d.action === 'done') {
+      this.endAside(false);
+      this.endPitch('done');
+    } else if (d.action === 'ask') {
+      const seat = this.seatByName(d.investor) ?? this.seatState(this.state.hostId!);
+      this.startAside(seat.seat.id, d.question || latest);
+    } else if (d.action === 'continue') this.endAside(true);
+  }
+
+  private startAside(seatId: string, question: string) {
+    const s = this.sessions.get(seatId);
+    if (!s || this.aside?.seatId === seatId) return; // already talking with them (they hear the founder live)
+    if (this.aside) this.sessions.get(this.aside.seatId)?.addContext(moderator.backToPitch(this.config));
+    const remainingMs = this.aside?.remainingMs ?? Math.max(0, (this.state.phaseEndsAt ?? Date.now()) - Date.now());
+    this.aside = { seatId, remainingMs };
+    const slide = this.slides.at(-1);
+    s.addContext(
+      `[Scribe] ${this.config.founderName}'s pitch so far: ${(this.scribe?.text ?? '').slice(-6000)}` +
+        (slide ? ' Their screen currently shows:' : ''),
+      slide ? [slide.jpegBase64] : [],
+    );
+    s.prompt(moderator.aside(this.config, this.seatState(seatId).seat, question));
+    this.set({ floorId: seatId, phaseEndsAt: null }); // pitch clock paused while the investor answers
+  }
+
+  private endAside(resume: boolean) {
+    if (!this.aside) return;
+    const { seatId, remainingMs } = this.aside;
+    this.aside = null;
+    this.sessions.get(seatId)?.addContext(moderator.backToPitch(this.config));
+    this.set({ floorId: null, phaseEndsAt: resume ? Date.now() + remainingMs : null });
+  }
+
   /** "Done pitching" button. */
   donePitching() {
-    if (this.state.phase === 'pitch' && !this.wrapPending) void this.endPitch('done');
+    if (this.state.phase !== 'pitch' || this.wrapPending) return;
+    this.endAside(false);
+    this.endPitch('done');
   }
 
   private endPitch(reason: 'time' | 'done') {
@@ -625,23 +714,47 @@ export class RoomController {
       ...this.activeSeats().filter((s) => s.seat.id !== host),
       ...this.activeSeats().filter((s) => s.seat.id === host),
     ];
+    // Interview panels (VC links): verdicts are private — they go to the VC's report, never to the founder.
+    const priv = !!this.config.panel;
+    if (priv) this.setDeliberating(true);
     for (const [i, s] of order.entries()) {
       if (this.phase !== 'verdict') return;
       const session = this.sessions.get(s.seat.id);
       if (!session || this.seatState(s.seat.id).status !== 'ready') continue;
-      const spoken = new Promise<string>((resolve) => {
-        this.waiters.set(s.seat.id, resolve);
-        setTimeout(() => resolve(''), VERDICT_TIMEOUT_MS);
-      });
-      session.prompt(moderator.verdict(this.config, s.seat, i === order.length - 1));
-      const text = await spoken;
-      this.waiters.delete(s.seat.id);
+      session.prompt(priv ? moderator.privateVerdict(this.config, s.seat) : moderator.verdict(this.config, s.seat, i === order.length - 1));
+      const text = await this.spoken(s.seat.id);
       const decision = parseVerdict(text);
       this.verdicts.push({ seatId: s.seat.id, name: s.seat.avatar, decision, text });
-      this.setSeat(s.seat.id, { verdict: decision });
+      if (!priv) this.setSeat(s.seat.id, { verdict: decision });
+    }
+    if (priv && this.phase === 'verdict') {
+      this.setDeliberating(false);
+      const host = this.state.hostId && this.sessions.get(this.state.hostId);
+      if (host) {
+        host.prompt(moderator.privateClose(this.config));
+        await this.spoken(this.state.hostId!);
+      }
     }
     await new Promise((r) => setTimeout(r, 1500));
     await this.end('complete');
+  }
+
+  /** Resolves with the seat's next spoken turn (or '' after VERDICT_TIMEOUT_MS). */
+  private spoken(seatId: string) {
+    return new Promise<string>((resolve) => {
+      const done = (text: string) => {
+        this.waiters.delete(seatId);
+        resolve(text);
+      };
+      this.waiters.set(seatId, done);
+      setTimeout(() => done(''), VERDICT_TIMEOUT_MS);
+    });
+  }
+
+  /** Mutes the panel's audio for the founder while the investors give private verdicts. */
+  private setDeliberating(on: boolean) {
+    for (const session of this.sessions.values()) session.player.video.muted = on;
+    this.set({ deliberating: on, caption: on ? null : this.state.caption });
   }
 
   // ---------- timer loop ----------
@@ -652,6 +765,15 @@ export class RoomController {
       this.lastChunkAt = Date.now();
       this.processChunk(this.scribe.text);
     }
+    if (
+      phase === 'pitch' &&
+      !this.wrapPending &&
+      !this.intentBusy &&
+      (this.scribe?.text.length ?? 0) > this.intentChecked &&
+      Date.now() - this.lastScribeAt >= INTENT_PAUSE_MS &&
+      !(this.aside && this.seatState(this.aside.seatId).speaking)
+    )
+      void this.checkPitch();
     if (!phaseEndsAt) return;
     const left = phaseEndsAt - Date.now();
     const key = `${phase}-warn`;
@@ -683,6 +805,7 @@ export class RoomController {
       this.set({ hostId: newHost });
       this.sessions.get(newHost)?.addContext(moderator.newHost(this.config));
     }
+    if (this.aside?.seatId === id) this.endAside(true);
     if (this.state.floorId === id && this.state.phase === 'qa') {
       const next = this.pickNext(id);
       if (next) this.giveFloor(next);

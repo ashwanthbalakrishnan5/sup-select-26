@@ -66,8 +66,8 @@ export function InviteForm({ panelId, record, voiceAnalysis }: { panelId: string
         <span>
           I understand this is an AI-run interview. The fund receives the transcript, an AI analysis of my answers
           {voiceAnalysis ? ', and voice-based signals of confidence and emotion inferred from my tone of voice' : ''}
-          {record ? ', and a recording of the call (my browser will ask to share this tab)' : ''}. My camera is shown only to me and is never
-          analyzed.
+          {record ? ', and a video recording of the call including my camera' : ''}. My camera is never sent to
+          an AI model or analyzed.
         </span>
       </label>
       {err('consent') && <p className="text-sm font-medium text-red-600">{errors.consent}</p>}

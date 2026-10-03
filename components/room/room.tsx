@@ -28,6 +28,8 @@ export function Room({ id, config, mode = 'practice' }: { id: string; config: Se
   const [camOn, setCamOn] = useState(true);
   const recorder = useRef<MeetingRecorder | null>(null);
   const [recording, setRecording] = useState(false);
+  // The meeting's camera + shared-screen <video>s, published by <Meeting> for the canvas recorder.
+  const mediaRef = useRef<{ camera: HTMLVideoElement | null; share: HTMLVideoElement | null }>({ camera: null, share: null });
 
   useEffect(() => {
     controller.setHandlers({
@@ -42,7 +44,6 @@ export function Room({ id, config, mode = 'practice' }: { id: string; config: Se
             toast.add({ title: "Couldn't save the recording.", type: 'warning' });
           }
         }
-        if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
         router.replace(afterMeeting(mode, id));
       },
     });
@@ -57,20 +58,27 @@ export function Room({ id, config, mode = 'practice' }: { id: string; config: Se
 
   useEffect(() => () => camera?.getTracks().forEach((t) => t.stop()), [camera]);
 
-  /** "Join meeting" click (user gesture): fullscreen + optional tab recording, then connect the panel. */
+  /** "Join meeting" click: optional recording (in-page, no browser prompt), then connect the panel. */
   function join(micOn: boolean) {
     if (config.record) {
-      const rec = new MeetingRecorder();
-      recorder.current = rec;
-      rec.start(controller.mic.stream).then(
-        () => setRecording(true),
-        () => {
-          recorder.current = null;
-          toast.add({ title: 'Recording was not started.', type: 'info' });
-        },
-      );
+      const rec = new MeetingRecorder(() => ({
+        investors: controller
+          .getState()
+          .seats.flatMap((s) => {
+            const video = s.status === 'ready' ? s.element?.querySelector('video') : null;
+            return video ? [{ name: `${s.seat.avatar} · ${s.title}`, video }] : [];
+          }),
+        camera: mediaRef.current.camera,
+        share: mediaRef.current.share,
+      }));
+      try {
+        rec.start(controller.mic.stream);
+        recorder.current = rec;
+        setRecording(true);
+      } catch {
+        toast.add({ title: 'Recording was not started.', type: 'info' });
+      }
     }
-    document.documentElement.requestFullscreen?.().catch(() => {});
     controller.setMicMuted(!micOn);
     void controller.start();
   }
@@ -97,6 +105,7 @@ export function Room({ id, config, mode = 'practice' }: { id: string; config: Se
       camOn={camOn}
       onCamOn={setCamOn}
       recording={recording}
+      mediaRef={mediaRef}
       onBackToSetup={() => router.push(mode === 'practice' ? '/founder' : mode === 'test' ? '/investor' : '/')}
     />
   );

@@ -4,6 +4,7 @@ import type {
   DeliveryChunk,
   FinishPayload,
   HandsDecision,
+  IntentDecision,
   LiveToken,
   SeatBrief,
   SessionConfig,
@@ -35,6 +36,8 @@ export const api = {
     post('/api/delivery', body, AbortSignal.timeout(45_000)).then((r) => json<DeliveryChunk>(r)),
   floorHands: (recent: string, seats: SeatBrief[]) =>
     post('/api/floor', { mode: 'hands', recent, seats }, AbortSignal.timeout(10_000)).then((r) => json<HandsDecision>(r)),
+  floorIntent: (body: { phase: 'intro' | 'pitch' | 'aside'; seats: SeatBrief[]; host: string; founder: string; latest: string; context: string }) =>
+    post('/api/floor', { mode: 'intent', ...body }, AbortSignal.timeout(4_000)).then((r) => json<IntentDecision>(r)),
   floorTurn: (body: {
     recent: string;
     seats: SeatBrief[];
